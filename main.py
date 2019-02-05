@@ -11,12 +11,13 @@ mongo_host = (os.getenv('CSP_MONGO_HOST', 'localhost'))
 mongo_port = (os.getenv('CSP_MONGO_PORT', 27017))
 mongo_user = (os.getenv('CSP_MONGO_USER', None))
 mongo_pass = (os.getenv('CSP_MONGO_PASS', None))
-mongo_collection = (os.getenv('CSP_MONGO_COLLECTION', 'csp'))
+mongo_database = (os.getenv('CSP_MONGO_DATABASE', 'csp_reports'))
+mongo_connection_string = (os.getenv('CSP_MONGO_CONNECTION_STRING', "mongodb://" + str(mongo_host) + ":" + str(mongo_port)))
 
 
 app = Flask(__name__)
-client = MongoClient(mongo_host, mongo_port, username=mongo_user, password=mongo_pass)
-db = client[mongo_collection]
+client = MongoClient(mongo_connection_string, username=mongo_user, password=mongo_pass)
+db = client[mongo_database]
 
 
 @app.errorhandler(400)  # 400 Bad Request
