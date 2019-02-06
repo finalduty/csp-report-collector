@@ -44,6 +44,7 @@ def error_405(error):
 
 @app.route('/', methods=['POST'])
 def csp_receiver():
+    ## https://junxiandoc.readthedocs.io/en/latest/docs/flask/flask_request_response.html
     print(request.content_type)
 
     if request.content_type != "application/csp-report":
