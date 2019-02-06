@@ -57,10 +57,7 @@ def csp_receiver():
 
     domain = urlparse(document_uri).hostname
     collection = db[domain]
-
     post = {"disposition": disposition, "blocked_uri": blocked_uri, "violated_directive": violated_directive}
-    print(post)
-    return make_response('', 204)
     document = collection.find_one(post)
 
     if document:
