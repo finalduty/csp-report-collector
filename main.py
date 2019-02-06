@@ -43,7 +43,7 @@ def error_405(error):
 
 @app.route('/', methods=['POST'])
 def csp_receiver():
-    if not request.json:
+    if not request.headers['Content-Type'].lower() == 'application/csp-report':
         abort(400)
 
     csp_report = request.json['csp-report']
