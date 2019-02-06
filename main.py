@@ -54,11 +54,11 @@ def csp_receiver():
     document_uri = html.escape(csp_report['document-uri'], quote=True)
     blocked_uri = html.escape(csp_report['blocked-uri'], quote=True)
     violated_directive = html.escape(csp_report['violated-directive'], quote=True)
-    disposition = html.escape(csp_report['disposition'], quote=True)
+    #disposition = html.escape(csp_report['disposition'], quote=True)
 
     domain = urlparse(document_uri).hostname
     collection = db[domain]
-    post = {"disposition": disposition, "blocked_uri": blocked_uri, "violated_directive": violated_directive}
+    post = {"blocked_uri": blocked_uri, "violated_directive": violated_directive}
     print(post)
 
     document = collection.find_one(post)
