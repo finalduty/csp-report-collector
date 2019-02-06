@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import datetime
 import html
 import os
+import json
 
 mongo_host = (os.getenv('CSP_MONGO_HOST', 'localhost'))
 mongo_port = (os.getenv('CSP_MONGO_PORT', 27017))
@@ -43,10 +44,12 @@ def error_405(error):
 
 @app.route('/', methods=['POST'])
 def csp_receiver():
-#    if not request.headers['Content-Type'].lower() == 'application/csp-report':
-#        abort(400)
+    print(request.content_type)
 
-    csp_report = request.json['csp-report']
+    if request.content_type != "application/csp-report":
+        abort(400)
+
+    csp_report = json.loads(request.data)['csp-report']
     document_uri = html.escape(csp_report['document-uri'], quote=True)
     blocked_uri = html.escape(csp_report['blocked-uri'], quote=True)
     violated_directive = html.escape(csp_report['violated-directive'], quote=True)
@@ -56,6 +59,8 @@ def csp_receiver():
     collection = db[domain]
 
     post = {"disposition": disposition, "blocked_uri": blocked_uri, "violated_directive": violated_directive}
+    print(post)
+    return make_response('', 204)
     document = collection.find_one(post)
 
     if document:
