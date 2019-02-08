@@ -4,7 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pyinstaller = "*"
+pipreqs = "*"
+v = {editable = true,version = "*"}
 
 [packages]
 flask = "*"

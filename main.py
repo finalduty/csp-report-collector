@@ -45,23 +45,31 @@ def error_405(error):
 @app.route('/', methods=['POST'])
 def csp_receiver():
     ## https://junxiandoc.readthedocs.io/en/latest/docs/flask/flask_request_response.html
-    print(request.content_type)
-
     if request.content_type != "application/csp-report":
         abort(400)
 
     csp_report = json.loads(request.data)['csp-report']
-    print(csp_report)
-    document_uri = html.escape(csp_report['document-uri'], quote=True)
-    blocked_uri = html.escape(csp_report['blocked-uri'], quote=True)
-    violated_directive = html.escape(csp_report['violated-directive'], quote=True)
+    print(datetime.datetime.now(), request.remote_addr, request.headers['X-Real-IP'], request.content_type, csp_report)
+
+    blocked_uri = html.escape(csp_report['blocked-uri'], quote=True).split(' ', 1)[0]
+    document_uri = html.escape(csp_report['document-uri'], quote=True).split(' ', 1)[0]
+    violated_directive = html.escape(csp_report['violated-directive'], quote=True).split(' ', 1)[0]
     #disposition = html.escape(csp_report['disposition'], quote=True)
+
+    if blocked_uri == 'about':
+        return make_response('', 204)
+
+    elif not blocked_uri:
+        if violated_directive == 'script-src':
+            blocked_uri = 'eval'
+
+        elif violated_directive == 'style-src':
+            blocked_uri = 'inline'
 
     domain = urlparse(document_uri).hostname
     collection = db[domain]
     post = {"blocked_uri": blocked_uri, "violated_directive": violated_directive}
-    print(post)
-
+    
     document = collection.find_one(post)
 
     if document:
