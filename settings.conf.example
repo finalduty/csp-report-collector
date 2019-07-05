@@ -1,0 +1,19 @@
+[main]
+port = 443
+host = 0.0.0.0
+debug = True
+
+[https]
+enable = True
+pubkey = /etc/ssl/certs/ssl-cert-snakeoil.pem
+privkey = /etc/ssl/private/ssl-cert-snakeoil.key
+
+
+[mongodb]
+enable = False
+host = localhost
+port = 27017
+user = None
+pass = None
+database = csp_reports
+
