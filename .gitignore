@@ -2,3 +2,5 @@
 build_and_deploy.sh
 .venv
 Pipfile.lock
+settings.conf
+.vscode
