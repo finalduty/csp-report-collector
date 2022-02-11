@@ -27,3 +27,11 @@ curl -X POST http://localhost:8000/ -H 'Content-Type: application/csp-report' --
 docker stop test_csp_report
 
 ```
+
+## Contributors ✨
+Thanks to the following people for their contributions:
+ - [Nicolas Béguier](https://github.com/nbeguier)
+
+
+## License
+[MIT License](LICENSE)

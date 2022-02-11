@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-""" CSP Report """
+__version__ = "0.3.0"
 
 # Standard library imports
 from urllib.parse import urlparse
-import datetime
+from datetime import datetime
 import html
 import json
 import logging
@@ -17,11 +17,13 @@ from pymongo import MongoClient
 # Debug
 # from pdb import set_trace as st
 
-VERSION = "%(prog)s 1.2.0"
-APP = Flask(__name__)
-REPORT_API_PATH = "/"
+app = Flask(__name__)
+
 if "REPORT_API_PATH" in os.environ:
     REPORT_API_PATH = os.environ["REPORT_API_PATH"]
+else:
+    REPORT_API_PATH = "/"
+
 
 def read_conf(conf_path):
     """
@@ -57,50 +59,50 @@ def read_conf(conf_path):
 
     return options
 
-@APP.errorhandler(400)  # 400 Bad Request
+
+@app.errorhandler(400)  # 400 Bad Request
 def error_400(error):
     return make_response(jsonify({
-        "error": str(error)
+        'error': str(error)
     }), 400)
 
 
-@APP.errorhandler(404)  # 404 Not Found
+@app.errorhandler(404)  # 404 Not Found
 def error_404(error):
     return make_response(jsonify({
-        "error": str(error)
+        'error': str(error)
     }), 404)
 
 
-@APP.errorhandler(405)  # 405 Method Not Allowed
+@app.errorhandler(405)  # 405 Method Not Allowed
 def error_405(error):
     return make_response(jsonify({
-        "error": str(error),
+        'error': str(error),
     }), 405)
 
 
-@APP.route(REPORT_API_PATH, methods=["POST"])
+@app.route(REPORT_API_PATH, methods=['POST'])
 def csp_receiver():
     ## https://junxiandoc.readthedocs.io/en/latest/docs/flask/flask_request_response.html
     if request.content_type != "application/csp-report":
         abort(400)
 
-    csp_report = json.loads(request.data.decode("UTF-8"))["csp-report"]
-    LOG.warning("{} - - [{}] Content-Type:'{}', Report:'{}'".format(request.remote_addr, datetime.datetime.now(), request.content_type, csp_report))
+    csp_report = json.loads(request.data.decode('UTF-8'))['csp-report']
+    logging.info(f'{datetime.now()} {request.remote_addr} {request.content_type} {csp_report}')
 
-    blocked_uri = html.escape(csp_report["blocked-uri"], quote=True).split(" ", 1)[0]
-    document_uri = html.escape(csp_report["document-uri"], quote=True).split(" ", 1)[0]
-    violated_directive = html.escape(csp_report["violated-directive"], quote=True).split(" ", 1)[0]
-    #disposition = html.escape(csp_report["disposition"], quote=True)
+    blocked_uri = html.escape(csp_report['blocked-uri'], quote=True).split(' ', 1)[0]
+    document_uri = html.escape(csp_report['document-uri'], quote=True).split(' ', 1)[0]
+    violated_directive = html.escape(csp_report['violated-directive'], quote=True).split(' ', 1)[0]
 
-    if blocked_uri == "about" or document_uri == "about":
-        return make_response("", 204)
+    if blocked_uri == 'about' or document_uri == 'about':
+        return make_response('', 204)
 
     elif not blocked_uri:
-        if violated_directive == "script-src":
-            blocked_uri = "eval"
+        if violated_directive == 'script-src':
+            blocked_uri = 'eval'
 
-        elif violated_directive == "style-src":
-            blocked_uri = "inline"
+        elif violated_directive == 'style-src':
+            blocked_uri = 'inline'
 
     if OPTIONS["mongodb"]["enable"]:
         domain = urlparse(document_uri).hostname
@@ -110,18 +112,20 @@ def csp_receiver():
         document = collection.find_one(post)
 
         if document:
-            document_id = document["_id"]
+            document_id = document['_id']
         else:
             document_id = collection.insert_one(post).inserted_id
 
-        collection.update_one({"_id": document_id}, {"$set": {"last_updated": datetime.datetime.now()}, "$inc": {"count": 1}})
+        collection.update_one({'_id': document_id}, {"$set": {'last_updated': datetime.datetime.now()}, '$inc': {'count': 1}})
 
-    return make_response("", 204)
+    return make_response('', 204)
 
-@APP.route("/health")
+
+@app.route("/health")
 def health():
-    result = {"name": "csp-report", "version": VERSION.split(" ")[1]}
+    result = {"name": "csp-report", "version": __version__}
     return make_response(json.dumps(result), 200)
+
 
 LOG = logging.getLogger("werkzeug")
 OPTIONS = read_conf("settings.conf")
@@ -129,5 +133,6 @@ MONGO_CONNECTION_STRING = "mongodb://{}:{}".format(OPTIONS["mongodb"]["host"], O
 CLIENT = MongoClient(MONGO_CONNECTION_STRING, username=OPTIONS["mongodb"]["user"], password=OPTIONS["mongodb"]["pass"])
 DB = CLIENT[OPTIONS["mongodb"]["database"]]
 
+
 if __name__ == "__main__":
-    APP.run("0.0.0.0")
+    app.run(host="0.0.0.0")
