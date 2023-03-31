@@ -16,4 +16,4 @@ RUN pip3 install -U pip
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8000
-CMD ["/usr/bin/gunicorn", "--workers=2", "--bind=0.0.0.0:8000", "--name=csp-endpoint", "main:APP"]
+CMD ["/usr/bin/gunicorn", "--workers=2", "--bind=0.0.0.0:8000", "--name=csp-endpoint", "main:app"]
