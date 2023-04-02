@@ -1,0 +1,1 @@
+FLASK_APP=src/csp_report_collector

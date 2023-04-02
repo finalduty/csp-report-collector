@@ -3,14 +3,22 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-pipreqs = "*"
-v = {editable = true,version = "*"}
-
 [packages]
 flask = "*"
+gunicorn = "*"
 pymongo = "*"
-gevent = "*"
+python-dotenv = "*"
+
+[dev-packages]
+csp-report-collector = {editable = true, path = "."}
+black = "*"
+isort = "*"
+mongomock = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"
+
+[scripts]
+build = "docker build -t local/csp-report-collector -f Dockerfile ."

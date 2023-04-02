@@ -1,8 +1,0 @@
-[mongodb]
-enable = False
-host = localhost
-port = 27017
-user = None
-pass = None
-database = csp_reports
-

@@ -1,0 +1,15 @@
+[tool.black]
+line-length = 999
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 999
+
+## https://docs.pytest.org/en/stable/reference/customize.html#pyproject-toml
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-q --cov=csp_report_collector --cov-fail-under=100 --cov-report term-missing"
+testpaths = [
+    "tests/"
+]
