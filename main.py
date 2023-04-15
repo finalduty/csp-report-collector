@@ -116,7 +116,7 @@ def csp_receiver():
         else:
             document_id = collection.insert_one(post).inserted_id
 
-        collection.update_one({'_id': document_id}, {"$set": {'last_updated': datetime.datetime.now()}, '$inc': {'count': 1}})
+        collection.update_one({'_id': document_id}, {"$set": {'last_updated': datetime.now()}, '$inc': {'count': 1}})
 
     return make_response('', 204)
 
