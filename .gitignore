@@ -1,6 +1,8 @@
-.idea
-build_and_deploy.sh
-.venv
-Pipfile.lock
+*.egg-info
+.env
+__pycache__
 settings.conf
+*.sqlite
+tmp/
+.venv
 .vscode

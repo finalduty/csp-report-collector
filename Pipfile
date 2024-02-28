@@ -3,14 +3,25 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-pipreqs = "*"
-v = {editable = true,version = "*"}
-
 [packages]
+click = "*"
+configparser = "*"
 flask = "*"
+flask-sqlalchemy = "*"
+gunicorn = "*"
 pymongo = "*"
-gevent = "*"
+python-dotenv = "*"
+sqlalchemy = "*"
+flask-pymongo = "*"
+flask-iniconfig = "*"
+celery = "*"
+
+[dev-packages]
+csp-report-collector = {file = ".", editable = true}
+black = "*"
+flake8 = "*"
+isort = "*"
+pytest = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.11"

@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 256
+ignore = 
+    E501 E265 E266
+    W293 E203
+
+select = C,E,F,W,B,B901
+exclude =
+    __pycache__,
+    .git,
+    alembic,
+    build,
+    dist,
