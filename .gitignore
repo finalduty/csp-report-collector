@@ -1,8 +1,9 @@
-*.egg-info
-.env
 __pycache__
-settings.conf
-*.sqlite
-tmp/
+.env
 .venv
 .vscode
+*.egg-info
+*.sqlite
+settings.conf
+tmp/
+settings.conf

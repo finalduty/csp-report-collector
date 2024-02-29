@@ -1,5 +1,5 @@
-#[tool.black]
-#line-length = 256
+[tool.black]
+line-length = 256
 #skip-string-normalization = true
 
 [tool.isort]

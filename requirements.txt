@@ -1,6 +1,0 @@
-configparser==3.7.4
-flask==1.0.3
-gevent==1.4.0
-gunicorn==19.9.0
-pymongo==3.8.0
-Werkzeug==0.15.5
