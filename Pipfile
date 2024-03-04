@@ -4,24 +4,25 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-click = "*"
-configparser = "*"
 flask = "*"
 flask-sqlalchemy = "*"
 gunicorn = "*"
-pymongo = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
-flask-pymongo = "*"
-flask-iniconfig = "*"
-celery = "*"
+psycopg2 = "*"
+mysqlclient = "*"
+pyodbc = "*"
 
 [dev-packages]
 csp-report-collector = {file = ".", editable = true}
 black = "*"
 flake8 = "*"
 isort = "*"
+mongomock = "*"
 pytest = "*"
+pytest-cov = "*"
+pytest-dotenv = "*"
+semver = "*"
 
 [requires]
 python_version = "3.10"

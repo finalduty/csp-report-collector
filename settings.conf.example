@@ -1,8 +1,9 @@
-[mongodb]
-enable = False
-host = localhost
-port = 27017
-user = None
-pass = None
-database = csp_reports
+[main]
+db_uri: "sqlite:///db.sqlite"
 
+#db_type: mariadb
+#db_host: localhost
+#db_port: 3306
+#db_username: <username>
+#db_password: <password>
+#db_name: csp_reports

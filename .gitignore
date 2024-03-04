@@ -1,9 +1,10 @@
 __pycache__
+.coverage
 .env
+.pytest_cache
 .venv
 .vscode
+*.conf
 *.egg-info
 *.sqlite
-settings.conf
 tmp/
-settings.conf

@@ -10,13 +10,14 @@ float_to_top = "true"
 [tool.pytest.ini_options]
 minversion = "6.0"
 #addopts = "-q --cov=src --cov-fail-under=100 --cov-report html --cov-report term-missing --no-cov-on-fail"
-addopts = "-q --cov=src/user_access_manager/api --cov=src/user_access_manager/ui --cov-report html --cov-report term-missing --no-cov-on-fail"
+addopts = "-q --cov=src --cov-report html --cov-report term-missing"
 env_files = [
     ".testenv"
 ]
 env_override_existing_values = 1
 filterwarnings = [
     #"ignore:'pipes' is deprecated:DeprecationWarning",
+    "ignore:pkg_resources is deprecated:DeprecationWarning",
 ]
 testpaths = [
     "tests"
