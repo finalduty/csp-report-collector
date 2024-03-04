@@ -6,6 +6,8 @@ on: ['push', 'pull_request']
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      CSPRC_DB_URI: "sqlite://"
 
     steps:
       - uses: actions/checkout@v3 # https://github.com/actions/cache
