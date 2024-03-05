@@ -1,0 +1,42 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Tests
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      CSPRC_DB_URI: "sqlite://"
+
+    steps:
+      ## https://github.com/marketplace/actions/checkout
+      - uses: actions/checkout@v4
+
+      ## https://github.com/marketplace/actions/setup-python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pipenv'
+
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: Install dependencies
+        run: |
+          pipenv install --dev
+
+      - name: Lint with flake8
+        run: |
+          pipenv run flake8 src/
+
+      - name: Format with black
+        run: |
+          pipenv run black --check src/
+
+      - name: Test with pytest
+        run: |
+          pipenv run pytest tests

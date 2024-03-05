@@ -1,0 +1,24 @@
+[tool.black]
+line-length = 256
+#skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 256
+float_to_top = "true"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+#addopts = "-q --cov=src --cov-fail-under=100 --cov-report html --cov-report term-missing --no-cov-on-fail"
+addopts = "-q --cov=src --cov-report html --cov-report term-missing"
+env_files = [
+    ".testenv"
+]
+env_override_existing_values = 1
+filterwarnings = [
+    #"ignore:'pipes' is deprecated:DeprecationWarning",
+    "ignore:pkg_resources is deprecated:DeprecationWarning",
+]
+testpaths = [
+    "tests"
+]
