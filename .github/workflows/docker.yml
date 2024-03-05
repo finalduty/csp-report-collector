@@ -41,13 +41,12 @@ jobs:
         run: |
           docker run --rm ${{ env.TEST_TAG }}
 
+      ## https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags:
-            #- ${{ env.GITHUB_REPOSITORY }}:latest
-            #- ${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF }}
-            - ${{ env.GITHUB_REPOSITORY }}:test
+          #tags: ${{ env.GITHUB_REPOSITORY }}:latest,${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF }}
+          tags: ${{ env.GITHUB_REPOSITORY }}:test
