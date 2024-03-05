@@ -24,5 +24,5 @@ RUN /root/.local/bin/pipenv install --deploy
 
 USER csprc
 EXPOSE 8000
-HEALTHCHECK CMD curl -f localhost:8000/status
+HEALTHCHECK CMD curl -fs localhost:8000/status
 CMD [".venv/bin/gunicorn", "--workers=2", "--bind=0.0.0.0:8000", "--name=csprc", "--access-logfile=-", "csp_report_collector:app"]

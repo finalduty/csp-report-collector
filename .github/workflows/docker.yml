@@ -39,7 +39,9 @@ jobs:
 
       - name: Test container starts
         run: |
-          docker run --rm ${{ env.TEST_TAG }}
+          docker run -d --rm --name csp_report_collector ${{ env.TEST_TAG }}
+          sleep 1
+          curl -fs localhost:8000/status | grep ok
 
       ## https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Build and push
