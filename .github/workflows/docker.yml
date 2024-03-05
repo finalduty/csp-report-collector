@@ -8,7 +8,7 @@ on:
 
 env:
   TEST_TAG: ${{ github.repository }}:test
-  DEPLOY_TAGS: ${{ github.repository }}:latest,${{ github.repository }}:${{ github.ref }}
+  DEPLOY_TAGS: ${{ github.repository }}:latest,${{ github.repository }}:${{ github.ref_name }}
 
 
 jobs:
@@ -39,9 +39,10 @@ jobs:
 
       - name: Test container starts
         run: |
-          docker run -d --rm --name csp_report_collector ${{ env.TEST_TAG }}
+          set -x
+          docker run -d -p8000:8000 --rm --name csp_report_collector ${{ env.TEST_TAG }}
           sleep 1
-          curl -fs localhost:8000/status | grep ok
+          curl -vfs localhost:8000/status | grep ok
 
       ## https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Build and push
