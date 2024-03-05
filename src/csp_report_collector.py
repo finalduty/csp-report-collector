@@ -9,6 +9,9 @@ from urllib.parse import urlparse
 
 import dotenv
 from flask import Flask, abort, jsonify, make_response, request
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import URL
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 __version__ = "0.4.0"
 
@@ -86,9 +89,6 @@ app.config.update(_load_config())
 db = None
 
 if app.config["db_type"]:
-    from flask_sqlalchemy import SQLAlchemy
-    from sqlalchemy import URL
-    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
     class BaseModel(DeclarativeBase):
         __abstract__ = True  # So SQLAlchemy doesn't create this as a table
