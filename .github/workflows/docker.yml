@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
   push:
 
-#env:
-#  TEST_TAG: user/app:test
-#  LATEST_TAG: user/app:latest
-#  CONTAINER_TAG: ${{ env.GITHUB_REF }}
+env:
+  TEST_TAG: ${{ github.repository }}:test
+  DEPLOY_TAGS: ${{ github.repository }}:latest,${{ github.repository }}:${{ github.ref }}
+
 
 jobs:
   docker:
@@ -30,7 +30,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and export to Docker
+      - name: Build container for testing
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -48,5 +48,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          #tags: ${{ env.GITHUB_REPOSITORY }}:latest,${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF }}
-          tags: ${{ env.GITHUB_REPOSITORY }}:test
+          tags: ${{ env.DEPLOY_TAGS }}
