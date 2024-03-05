@@ -10,9 +10,11 @@ jobs:
       CSPRC_DB_URI: "sqlite://"
 
     steps:
-      - uses: actions/checkout@v3 # https://github.com/actions/cache
+      ## https://github.com/marketplace/actions/checkout
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4 # https://github.com/actions/setup-python
+      ## https://github.com/marketplace/actions/setup-python
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pipenv'
