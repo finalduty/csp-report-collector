@@ -7,11 +7,11 @@ verify_ssl = true
 flask = "*"
 flask-sqlalchemy = "*"
 gunicorn = "*"
+mysqlclient = "*"
+psycopg = "*"
+pyodbc = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
-psycopg2 = "*"
-mysqlclient = "*"
-pyodbc = "*"
 
 [dev-packages]
 csp-report-collector = {file = ".", editable = true}
@@ -25,4 +25,4 @@ pytest-dotenv = "*"
 semver = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"

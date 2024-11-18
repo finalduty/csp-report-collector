@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3.20
 
 ENV PATH=/root/.local/bin:$PATH
 ENV PIPENV_VENV_IN_PROJECT=1
