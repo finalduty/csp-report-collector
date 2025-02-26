@@ -8,12 +8,12 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import dotenv
-from flask import Flask, abort, jsonify, make_response, request
+from flask import Flask, abort, jsonify, make_response, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import URL
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 SUPPORTED_DB_ENGINES = [
     "mariadb",
@@ -142,8 +142,9 @@ def error_405(error):
 @app.route("/", methods=["POST"])
 def csp_receiver():
     ## https://junxiandoc.readthedocs.io/en/latest/docs/flask/flask_request_response.html
-    if request.content_type != "application/csp-report":
-        abort(400, f"Invalid content type. Expected 'application/csp-report', got '{request.content_type}'.")
+    csp_content_type =  ["application/csp-report", "application/reports+json"]
+    if not request.content_type in csp_content_type:
+        abort(400, f"Invalid content type. Expected one of {" ".join(csp_content_type)}, got '{request.content_type}'.")
 
     csp_report = json.loads(request.data.decode("UTF-8"))["csp-report"]
     log.info(f"{datetime.now()} {request.remote_addr} {request.content_type} {csp_report}")
@@ -181,6 +182,11 @@ def csp_receiver():
 
     return make_response(jsonify({}), 204)
 
+@app.route("/reports",methods=["GET"])
+def csp_reports():
+    db = app.config["db"]
+    reports = db.session.execute(db.select(ReportsModel).order_by(ReportsModel.reported_at)).scalars()
+    return render_template("reports.jinja", reports=reports)
 
 def _write_to_database(
     db: SQLAlchemy,

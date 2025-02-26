@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8" />
+        <title>csp reports</title>
+        <link rel="stylesheet" type="text/css" href="/static/style.css" />
+    </head>
+    <body>
+    <div class="head">
+        <header>
+            <h1>CSP Reports</h1>
+        </header>
+    </div>
+    <div class="mainbody">
+        <table class="reports">
+        <tr>
+            <th>Domain</th><th>Document URI</th><th>Blocked URI</th><th>Violated Directive</th><th>Reported time</th>
+        </tr>
+        {% for report in reports %}
+        <tr class="row-{{ loop.index % 2 }}">
+            <td>{{ report.domain }}</td><td>{{ report.document_uri }}</td><td>{{ report.blocked_uri }}</td><td>{{ report.violated_directive }}</td><td>{{ report.reported_at }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+    </body>
+</html>
