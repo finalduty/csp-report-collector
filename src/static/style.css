@@ -9,10 +9,14 @@
     font-family: sans-serif;
 }
 
-table.reports {
-    border: 1px solid #777;
+.mainbody {
     margin: 1em auto;
     width: 80%;
+}
+
+table.reports {
+    border: 1px solid #777;
+    width: 100%;
 }
 
 tr.row-0 {
@@ -21,4 +25,17 @@ tr.row-0 {
 
 tr.row-1 {
     background-color: #b9c4db;
+}
+
+.pager {
+    text-align: right;
+}
+
+.pager ul {
+    list-style: none
+}
+
+.pager li {
+    display: inline-block;
+    margin:0px 1em;
 }

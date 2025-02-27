@@ -184,9 +184,12 @@ def csp_receiver():
 
 @app.route("/reports",methods=["GET"])
 def csp_reports():
-    db = app.config["db"]
-    reports = db.session.execute(db.select(ReportsModel).order_by(ReportsModel.reported_at)).scalars()
+    pagenum: int = int(request.args.get("p", 1))
+    pagesize: int = 50
+    db: SQLAlchemy = app.config["db"]
+    reports = db.paginate(db.select(ReportsModel).order_by(ReportsModel.reported_at),page=pagenum,per_page=pagesize,max_per_page=100)
     return render_template("reports.jinja", reports=reports)
+
 
 def _write_to_database(
     db: SQLAlchemy,

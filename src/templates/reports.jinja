@@ -12,11 +12,12 @@
         </header>
     </div>
     <div class="mainbody">
+        <div class="pager"><ul><li><a {% if reports.has_prev -%} href="/reports?p={{ reports.prev_num }}"{% endif %}>previous</a></li><li><a {% if reports.has_next -%} href="/reports?p={{reports.next_num }}"{% endif %}>next</a></li></ul></div>
         <table class="reports">
         <tr>
             <th>Domain</th><th>Document URI</th><th>Blocked URI</th><th>Violated Directive</th><th>Reported time</th>
         </tr>
-        {% for report in reports %}
+        {% for report in reports.items %}
         <tr class="row-{{ loop.index % 2 }}">
             <td>{{ report.domain }}</td><td>{{ report.document_uri }}</td><td>{{ report.blocked_uri }}</td><td>{{ report.violated_directive }}</td><td>{{ report.reported_at }}</td>
         </tr>
