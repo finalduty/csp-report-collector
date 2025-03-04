@@ -12,14 +12,14 @@
         </header>
     </div>
     <div class="mainbody">
-        <div class="pager"><ul><li><a {% if reports.has_prev -%} href="/reports?p={{ reports.prev_num }}"{% endif %}>previous</a></li><li><a {% if reports.has_next -%} href="/reports?p={{reports.next_num }}"{% endif %}>next</a></li></ul></div>
+        <div class="navbar"><ul><li><a {% if reports.has_prev -%} href="/reports?p={{ reports.prev_num }}"{% endif %}>previous</a></li><li class="list-separator"><a {% if reports.has_next -%} href="/reports?p={{reports.next_num }}"{% endif %}>next</a></li></ul></div>
         <table class="reports">
         <tr>
             <th>Domain</th><th>Document URI</th><th>Blocked URI</th><th>Effective Directive</th><th>Disposition</th><th>Reported Time</th>
         </tr>
         {% for report in reports.items %}
         <tr class="row-{{ loop.index % 2 }}">
-            <td>{{ report.domain }}</td><td>{{ report.document_uri }}</td><td>{{ report.blocked_uri }}</td><td>{{ report.effective_directive }}</td><td>{{ report.disposition }}</td><td>{{ report.reported_at }}</td>
+            <td><a href="/reports/{{ report.id }}">{{ report.domain }}</a></td><td>{{ report.document_uri }}</td><td>{{ report.blocked_uri }}</td><td>{{ report.effective_directive }}</td><td>{{ report.disposition }}</td><td>{{ report.reported_at }}</td>
         </tr>
         {% endfor %}
         </table>

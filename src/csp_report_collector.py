@@ -157,6 +157,12 @@ def display_csp_reports():
     reports = db.paginate(db.select(csp_datamodel.ReportsModel).order_by(csp_datamodel.ReportsModel.reported_at),page=pagenum,per_page=pagesize,max_per_page=100)
     return render_template("reports.jinja", reports=reports)
 
+@app.route("/reports/<int:id>", methods=["GET"])
+def display_single_report(id: int):
+    db: SQLAlchemy = app.config["db"]
+    report = db.session.execute(db.select(csp_datamodel.ReportsModel).filter_by(id=id)).scalar_one()
+    return render_template("reports_detail.jinja", report=report)
+
 @app.route("/status")
 def status():
     return make_response("ok", 200)

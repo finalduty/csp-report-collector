@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8" />
+        <title>csp reports :: Detail</title>
+        <link rel="stylesheet" type="text/css" href="/static/style.css" />
+    </head>
+    <body>
+    <div class="head">
+        <header>
+            <h1>Report Detail</h1>
+        </header>
+    </div>
+    <div class="mainbody">
+        <div class="navbar"><span id="crumbs"><a href="/reports">All Reports</a></span></div>
+        <div class="report">
+            <div class="row">
+                <div class="header">
+                    Report Domain
+                </div><div class="data">
+                    {{ report.domain }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Document URI
+                </div><div class="data">
+                    {{ report.document_uri }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Blocked URI
+                </div>
+                <div class="data">
+                    {{ report.blocked_uri }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Effective Directive
+                </div>
+                <div class="data">
+                    {{ report.effective_directive }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Request Status
+                </div>
+                <div class="data">
+                    {{ report.status_code }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Disposition
+                </div>
+                <div class="data">
+                    {{ report.disposition }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Original Policy
+                </div>
+                <div class="data">
+                    {{ report.original_policy }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Line Number
+                </div>
+                <div class="data">
+                    {{ report.line_number }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Column Number
+                </div>
+                <div class="data">
+                    {{ report.column_number }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Sample
+                </div>
+                <div class="data">
+                    <pre>
+                    {{ report.sample }}
+                    </pre>
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Referrer
+                </div>
+                <div class="data">
+                {{ report.referrer }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    User Agent
+                </div>
+                <div class="data">
+                    {{ report.user_agent }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="header">
+                    Report Time
+                </div>
+                <div class="data">
+                    {{ report.reported_at }}
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

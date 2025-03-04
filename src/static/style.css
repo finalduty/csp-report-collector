@@ -1,12 +1,12 @@
+html {
+    font-family: sans-serif;
+}
+
 .head {
     width: 100%;
     margin: 0px 0px 0px 10px;
     padding: 10px;
     border-bottom: 2px solid #000;
-}
-
-.head h1 {
-    font-family: sans-serif;
 }
 
 .mainbody {
@@ -27,15 +27,73 @@ tr.row-1 {
     background-color: #b9c4db;
 }
 
-.pager {
+td {
+    padding: .25em;
+}
+
+.navbar {
     text-align: right;
+    width: 100%;
 }
 
-.pager ul {
-    list-style: none
+.navbar ul {
+    list-style: none;
 }
 
-.pager li {
+.navbar li {
     display: inline-block;
-    margin:0px 1em;
+    margin:0;
+    padding:0;
+}
+
+.navbar li.list-separator:before {
+    content: "|";
+    padding: 0 1em;
+}
+
+#crumbs {
+    font-size: .8em;
+    font-family: sans-serif
+}
+
+.report {
+    margin:0;
+    padding:0;
+    width: 100%;
+}
+
+.report .row {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: 0em;
+    border-bottom: 1px solid #777;
+}
+
+.header, .data {
+    display: inline-block;
+    margin: 0;
+    padding: 0 0 .5em 0;
+}
+
+.report .header {
+    font-weight: bold;
+    min-width: 150px;
+    font-size: 1rem;
+    margin: 0;
+    padding: .5em 0 .25em 0;
+    width: 20%;
+}
+
+.report .data {
+    min-width: 250px;
+    font-size: 1rem;
+    width: 80%;
+}
+
+.report .data pre {
+    margin: 0px;
+    padding: 0px;
+    font-family: monospace;
+    white-space: nowrap;
 }
