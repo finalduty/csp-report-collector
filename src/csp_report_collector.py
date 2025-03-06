@@ -143,7 +143,7 @@ def csp_receiver():
 
     try:
         if app.config["db"]:
-            csp_report.write(db)
+            csp_report.write(db.session)
     except Exception as e:
         abort(500, e)
 

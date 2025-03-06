@@ -5,6 +5,7 @@ from csp_datamodel import ReportsModel
 
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm.session import Session
 from urllib.parse import urlparse
 
 
@@ -84,7 +85,7 @@ class ReportURI(CSPReport):
         except KeyError as e:
             raise RequiredElementMissingError(f"Missing required element: {e}")
 
-    def write(self, db: SQLAlchemy) -> None:
+    def write(self, db_session: Session) -> None:
         report = ReportsModel(
             domain=self.domain,
             document_uri=self.document_uri,
@@ -98,8 +99,8 @@ class ReportURI(CSPReport):
             reported_at=self.received
         )
 
-        db.session.add(report)
-        db.session.commit()
+        db_session.add(report)
+        db_session.commit()
 
 # See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-to
 # See also https://www.w3.org/TR/CSP3/#reporting
@@ -156,7 +157,7 @@ class ReportTo(CSPReport):
         except KeyError:
             self.referrer = None
 
-    def write(self, db: SQLAlchemy) -> None:
+    def write(self, db_session: Session) -> None:
         report = ReportsModel(
             domain=self.domain,
             document_uri=self.document_uri,
@@ -173,8 +174,8 @@ class ReportTo(CSPReport):
             reported_at=self.received
         )
 
-        db.session.add(report)
-        db.session.commit()
+        db_session.add(report)
+        db_session.commit()
 
 def get_report(report: dict) -> CSPReport:
     try:
