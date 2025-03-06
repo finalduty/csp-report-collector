@@ -110,9 +110,9 @@ class ReportTo(CSPReport):
 
         try:
             if request_data["type"] != "csp-violation":
-                raise RequiredElementMissingError(f"Report type must be 'csp-violation' but got {request_data["type"]}")
+                raise InvalidReportType(f"Report type must be 'csp-violation' but got {request_data["type"]}")
         except KeyError:
-            raise InvalidReportType(f"Report is not a valid csp-violation report")
+            raise RequiredElementMissingError(f"Report is not a valid csp-violation report")
         
         try:
             self.user_agent = html.escape(request_data["user_agent"], quote=True)
