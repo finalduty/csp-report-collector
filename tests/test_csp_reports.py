@@ -14,63 +14,63 @@ def empty():
 def none():
     return None
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def legacy_report_type():
     return "csp-report"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def report_type():
     return "csp-violation"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def user_agent():
     return "Mozilla/5.0 - pytest"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def document_url():
     return "https://pytest.test-domain.com/test"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def blocked_url():
     return "https://www.evil.com/payload/evil.js"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def effective_directive():
     return "inline-src"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def original_policy():
     return "default-src 'self';"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def referrer():
     return "https://www.duckduckgo.com"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def source_file():
     return "https://my-domain.com/about"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def disposition():
     return "enforce"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def column_number():
     return "39"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def line_number():
     return "17"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample():
     return "<javascript>alert(1);</javascript>"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def status_code():
     return "200"
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def get_db():
     engine = create_engine("sqlite:///:memory:")
     csp_datamodel.ReportsModel.metadata.create_all(engine)
@@ -154,11 +154,11 @@ def generate_report_uri(*args) -> dict:
 
     return report_uri
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def report_to(report_type,user_agent, document_url, blocked_url, effective_directive, original_policy, referrer, disposition, source_file, column_number, line_number, sample, status_code):
     return generate_report_to(report_type,user_agent, document_url, blocked_url, document_url, effective_directive, original_policy, referrer, disposition, source_file, column_number, line_number, sample, status_code)
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def report_uri(legacy_report_type,blocked_url, document_url, disposition, effective_directive, original_policy, referrer, sample, status_code):
     return generate_report_uri(legacy_report_type,blocked_url, document_url, disposition, effective_directive, effective_directive, original_policy, referrer, sample, status_code)
 
