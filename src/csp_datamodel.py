@@ -7,14 +7,16 @@ from typing import get_args
 
 ReportDisposition = Literal["enforce", "report"]
 
+
 class BaseModel(DeclarativeBase):
-        __abstract__ = True  # So SQLAlchemy doesn't create this as a table
-        pass
+    __abstract__ = True  # So SQLAlchemy doesn't create this as a table
+    pass
+
 
 class ReportsModel(BaseModel):
     __tablename__ = "reports"
 
-    '''
+    """
     csp report can be in one of two forms:
     - The legacy `report-uri` format which is simplified json
         - Content-Type: application/csp-report
@@ -56,7 +58,7 @@ class ReportsModel(BaseModel):
         "url": "https://example.com/csp-report",
         "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
     }
-    '''
+    """
 
     id: Mapped[int] = mapped_column(primary_key=True)
     domain: Mapped[str] = mapped_column(nullable=False, index=True)
@@ -64,12 +66,7 @@ class ReportsModel(BaseModel):
     blocked_uri: Mapped[str] = mapped_column(nullable=True, index=True)
     effective_directive: Mapped[str] = mapped_column(nullable=False, index=True)
     status_code: Mapped[int] = mapped_column(nullable=False)
-    disposition: Mapped[ReportDisposition] = mapped_column(Enum(
-        *get_args(ReportDisposition),
-        name="disposition",
-        create_constraint=True,
-        validate_strings=True
-    ), nullable=False)
+    disposition: Mapped[ReportDisposition] = mapped_column(Enum(*get_args(ReportDisposition), name="disposition", create_constraint=True, validate_strings=True), nullable=False)
     original_policy: Mapped[str] = mapped_column(nullable=False)
     line_number: Mapped[int] = mapped_column(nullable=True)
     column_number: Mapped[int] = mapped_column(nullable=True)

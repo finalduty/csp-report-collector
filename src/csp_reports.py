@@ -2,7 +2,6 @@ import abc
 import html
 
 from csp_datamodel import ReportsModel
-
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.session import Session
@@ -12,19 +11,23 @@ from urllib.parse import urlparse
 class AboutException(Exception):
     pass
 
+
 class RequiredElementMissingError(Exception):
     pass
+
 
 class InvalidReportType(RequiredElementMissingError):
     pass
 
+
 class CSPReport(abc.ABC):
-    def __init__(self,received: datetime):
+    def __init__(self, received: datetime):
         self.received = received
 
     @abc.abstractmethod
     def write(self, db: SQLAlchemy):
         pass
+
 
 # See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri#violation_report_syntax
 # Officially deprecated
@@ -34,7 +37,7 @@ class ReportURI(CSPReport):
             csp_report = request_data["csp-report"]
         except KeyError:
             raise InvalidReportType("Report is not of the 'csp-report' type")
-        
+
         super().__init__(received)
 
         try:
@@ -46,7 +49,7 @@ class ReportURI(CSPReport):
             self.document_uri = html.escape(csp_report["document-uri"], quote=True).split(" ", 1)[0]
         except KeyError:
             raise RequiredElementMissingError("Missing required element 'document-uri'")
-        
+
         try:
             self.effective_directive = html.escape(csp_report["effective-directive"], quote=True).split(" ", 1)[0]
         except KeyError:
@@ -96,11 +99,12 @@ class ReportURI(CSPReport):
             sample=self.sample,
             original_policy=self.original_policy,
             referrer=self.referrer,
-            reported_at=self.received
+            reported_at=self.received,
         )
 
         db_session.add(report)
         db_session.commit()
+
 
 # See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-to
 # See also https://www.w3.org/TR/CSP3/#reporting
@@ -108,21 +112,19 @@ class ReportTo(CSPReport):
     def __init__(self, request_data: dict, received: datetime = datetime.now(timezone.utc)):
         super().__init__(received)
 
-        self._violation_uri_types = [
-            "inline", "eval", "wasm-eval", "trusted-types-policy", "trusted-types-sink"
-        ]
+        self._violation_uri_types = ["inline", "eval", "wasm-eval", "trusted-types-policy", "trusted-types-sink"]
 
         try:
             if request_data["type"] != "csp-violation":
                 raise InvalidReportType(f"Report type must be 'csp-violation' but got {request_data["type"]}")
         except KeyError:
             raise InvalidReportType(f"Report is not a valid csp-violation report: missing 'type': 'csp-violation'")
-        
+
         try:
             self.user_agent = html.escape(request_data["user_agent"], quote=True)
         except KeyError:
             self.user_agent = None
-        
+
         csp_report = {}
 
         try:
@@ -133,10 +135,10 @@ class ReportTo(CSPReport):
             self.disposition = html.escape(csp_report["disposition"], quote=True)
             self.status_code = int(csp_report["statusCode"])
             self.original_policy = html.escape(csp_report["originalPolicy"], quote=True)
-            self.sample = html.escape(csp_report["sample"],quote=True)
+            self.sample = html.escape(csp_report["sample"], quote=True)
         except KeyError as e:
             raise RequiredElementMissingError("Missing required element '{e}'")
-        
+
         try:
             self.blocked_uri = html.escape(csp_report["blockedURL"], quote=True).split(" ", 1)[0]
         except KeyError:
@@ -145,13 +147,13 @@ class ReportTo(CSPReport):
         ## Short-ciruit reports for 'about' pages, i.e. about:config, etc.
         if self.blocked_uri == "about" or self.document_uri == "about":
             raise AboutException()
-        
+
         # blockedURL must be one of a set of strings, or a valid URL
         if self.blocked_uri not in self._violation_uri_types and self.blocked_uri is not None:
             parsed_blocked_uri = urlparse(self.blocked_uri)
             if parsed_blocked_uri.scheme not in ["http", "https", "ws", "wss"] or not parsed_blocked_uri.netloc:
                 raise RequiredElementMissingError("BlockedURI is not a valid string or URL")
-        
+
         try:
             self.column_number = int(csp_report["columnNumber"])
         except KeyError:
@@ -181,11 +183,12 @@ class ReportTo(CSPReport):
             sample=self.sample,
             referrer=self.referrer,
             user_agent=self.user_agent,
-            reported_at=self.received
+            reported_at=self.received,
         )
 
         db_session.add(report)
         db_session.commit()
+
 
 def get_report(report: dict) -> CSPReport:
     try:
@@ -196,7 +199,5 @@ def get_report(report: dict) -> CSPReport:
         except InvalidReportType:
             raise InvalidReportType("Submitted report could not be serialized: unknown or invalid report type")
 
-csp_content_type = [
-    "application/csp-report", 
-    "application/reports+json"
-]
+
+csp_content_type = ["application/csp-report", "application/reports+json"]

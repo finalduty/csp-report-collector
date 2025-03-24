@@ -30,6 +30,7 @@ logging.basicConfig(
 
 ### Private Functions ###
 
+
 def _load_config(config_path: Optional[str] = "settings.conf", env_prefix: str = "CSPRC") -> dict:
     ## Initialise supported variables
     config: dict[str, Optional[str]] = {
@@ -104,30 +105,35 @@ app.config["db"] = db
 
 ### Flask Handlers ###
 
+
 @app.errorhandler(400)  # 400 Bad Request
 def error_400(error):
     app.logger.warning(f"Error[400]: {error}")
     return make_response(jsonify({"error": str(error)}), 400)
 
+
 @app.errorhandler(404)  # 404 Not Found
 def error_404(error):
     return make_response(jsonify({"error": str(error)}), 404)
+
 
 @app.errorhandler(405)  # 405 Method Not Allowed
 def error_405(error):
     return make_response(jsonify({"error": str(error)}), 405)
 
-@app.errorhandler(500) # 500 Internal Server Error
+
+@app.errorhandler(500)  # 500 Internal Server Error
 def error_500(error):
     app.logger.error(f"Error[500]: {error}")
     return make_response(jsonify({"error": "Unable to handle request.  See logs for details."}))
 
+
 @app.route("/csp-report", methods=["POST"])
 def csp_receiver():
     ## https://junxiandoc.readthedocs.io/en/latest/docs/flask/flask_request_response.html
-    
+
     report_json = request.get_json(force=True)
-    app.logger.debug(f"{datetime.now()} {request.remote_addr} {request.content_type} {report_json}") 
+    app.logger.debug(f"{datetime.now()} {request.remote_addr} {request.content_type} {report_json}")
 
     if not request.content_type in csp_reports.csp_content_type:
         abort(400, f"Invalid content type. Expected one of {" ".join(csp_reports.csp_content_type)}, got '{request.content_type}'.")
@@ -149,19 +155,22 @@ def csp_receiver():
 
     return make_response(jsonify({}), 204)
 
-@app.route("/reports",methods=["GET"])
+
+@app.route("/reports", methods=["GET"])
 def display_csp_reports():
     pagenum: int = int(request.args.get("p", 1))
     pagesize: int = 50
     db: SQLAlchemy = app.config["db"]
-    reports = db.paginate(db.select(csp_datamodel.ReportsModel).order_by(csp_datamodel.ReportsModel.reported_at),page=pagenum,per_page=pagesize,max_per_page=100)
+    reports = db.paginate(db.select(csp_datamodel.ReportsModel).order_by(csp_datamodel.ReportsModel.reported_at), page=pagenum, per_page=pagesize, max_per_page=100)
     return render_template("reports.jinja", reports=reports)
+
 
 @app.route("/reports/<int:id>", methods=["GET"])
 def display_single_report(id: int):
     db: SQLAlchemy = app.config["db"]
     report = db.session.execute(db.select(csp_datamodel.ReportsModel).filter_by(id=id)).scalar_one()
     return render_template("reports_detail.jinja", report=report)
+
 
 @app.route("/status")
 def status():
