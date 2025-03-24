@@ -61,7 +61,7 @@ class ReportsModel(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     domain: Mapped[str] = mapped_column(nullable=False, index=True)
     document_uri: Mapped[str] = mapped_column(nullable=False, index=True)
-    blocked_uri: Mapped[str] = mapped_column(nullable=False, index=True)
+    blocked_uri: Mapped[str] = mapped_column(nullable=True, index=True)
     effective_directive: Mapped[str] = mapped_column(nullable=False, index=True)
     status_code: Mapped[int] = mapped_column(nullable=False)
     disposition: Mapped[ReportDisposition] = mapped_column(Enum(
