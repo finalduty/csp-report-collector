@@ -108,6 +108,10 @@ class ReportTo(CSPReport):
     def __init__(self, request_data: dict, received: datetime = datetime.now(timezone.utc)):
         super().__init__(received)
 
+        self._violation_uri_types = [
+            "inline", "eval", "wasm-eval", "trusted-types-policy", "trusted-types-sink"
+        ]
+
         try:
             if request_data["type"] != "csp-violation":
                 raise InvalidReportType(f"Report type must be 'csp-violation' but got {request_data["type"]}")
@@ -132,7 +136,7 @@ class ReportTo(CSPReport):
             self.sample = html.escape(csp_report["sample"],quote=True)
         except KeyError as e:
             raise RequiredElementMissingError("Missing required element '{e}'")
-
+        
         try:
             self.blocked_uri = html.escape(csp_report["blockedURL"], quote=True).split(" ", 1)[0]
         except KeyError:
@@ -141,6 +145,12 @@ class ReportTo(CSPReport):
         ## Short-ciruit reports for 'about' pages, i.e. about:config, etc.
         if self.blocked_uri == "about" or self.document_uri == "about":
             raise AboutException()
+        
+        # blockedURL must be one of a set of strings, or a valid URL
+        if self.blocked_uri not in self._violation_uri_types and self.blocked_uri is not None:
+            parsed_blocked_uri = urlparse(self.blocked_uri)
+            if parsed_blocked_uri.scheme not in ["http", "https", "ws", "wss"] or not parsed_blocked_uri.netloc:
+                raise RequiredElementMissingError("BlockedURI is not a valid string or URL")
         
         try:
             self.column_number = int(csp_report["columnNumber"])
