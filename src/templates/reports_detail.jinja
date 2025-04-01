@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf8" />
         <title>csp reports :: Detail</title>
-        <link rel="stylesheet" type="text/css" href="/static/style.css" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
     </head>
     <body>
     <div class="head">
@@ -12,7 +12,7 @@
         </header>
     </div>
     <div class="mainbody">
-        <div class="navbar"><span id="crumbs"><a href="/reports">All Reports</a></span></div>
+        <div class="navbar"><span id="crumbs"><a href="{{ url_for('display_csp_reports') }}">All Reports</a></span></div>
         <div class="report">
             <div class="row">
                 <div class="header">
