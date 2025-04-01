@@ -1,27 +1,21 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
+name = "pypi"
 
 [packages]
-flask = "*"
 flask-sqlalchemy = "*"
+flask = "*"
 gunicorn = "*"
-mysqlclient = "*"
 psycopg = "*"
+mysqlclient = "*"
 pyodbc = "*"
 python-dotenv = "*"
-sqlalchemy = "*"
 
 [dev-packages]
-csp-report-collector = {file = ".", editable = true}
 black = "*"
 flake8 = "*"
-isort = "*"
-mongomock = "*"
 pytest = "*"
-pytest-cov = "*"
-pytest-dotenv = "*"
 semver = "*"
 
 [requires]

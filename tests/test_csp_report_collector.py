@@ -1,112 +1,62 @@
-#!/usr/bin/env python3
-## https://flask.palletsprojects.com/en/latest/testing/
-
-from datetime import datetime
-from unittest.mock import patch
-
-import mongomock
+import csp_report_collector
 import pytest
+
 from flask.testing import FlaskClient
 from semver.version import Version
 
-import csp_report_collector
-from csp_report_collector import app, db
+from test_csp_reports import generate_report_to, generate_report_uri
+from conftest import FixedData
 
-
-def default():
-    pass
-
-
-@pytest.fixture(scope="session")
-def mongo_test_db():
-    import mongomock
-
-    yield mongomock.MongoClient()["test"]
-
-
-@pytest.fixture(scope="session")
-def sql_test_db(flask_app):
-    from flask_sqlalchemy import SQLAlchemy
-
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite::memory:"
-    db = SQLAlchemy(model_class=csp_report_collector.BaseModel)
-    db.init_app(flask_app)
-
-    yield db
-
+@pytest.fixture()
+def app():
+    yield csp_report_collector.app
 
 @pytest.fixture(autouse=True)
-def client():
+def client(app):
     with app.app_context():
         yield app.test_client()
 
-
-@pytest.fixture()
-def mongo_mock():
-    mongo_client = mongomock.MongoClient()
-    yield mongo_client["test"]
-
-
-def test__write_to_database():
-    csp_report = {
-        "domain": "domain.evil",
-        "blocked_uri": "https://domain.evil/",
-        "document_uri": "https://domain.evil/",
-        "reported_at": datetime.utcnow(),
-        "violated_directive": "frame-ancestors",
-    }
-
-    csp_report_collector._write_to_database(db, **csp_report)
-
-    assert db.session.query(csp_report_collector.ReportsModel).count()
-
-
 @pytest.mark.parametrize(
-    "content_type,request_method,request_uri,blocked_uri,violated_directive,expected_status_code,expected_response",
     [
-        pytest.param(default, default, default, default, default, 204, None, id="pass"),
-        pytest.param(default, default, default, None, "script-src", 204, None, id="pass-eval"),
-        pytest.param(default, default, default, None, "style-src", 204, None, id="pass-inline"),
-        pytest.param(default, default, default, "about", default, 204, None, id="pass-about"),
-        pytest.param("application/json", default, default, default, default, 400, {"error": "400 Bad Request: Invalid content type. Expected 'application/csp-report', got 'application/json'."}, id="invalid_content_type"),
-        pytest.param(default, default, "/notfound", default, default, 404, {"error": "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."}, id="not_found"),
-        pytest.param(default, "GET", default, default, default, 405, {"error": "405 Method Not Allowed: The method is not allowed for the requested URL."}, id="method_not_allowed"),
+        "legacy_report_type",
+        "blocked_url",
+        "document_url",
+        "disposition",
+        "effective_directive",
+        "violated_directive",
+        "original_policy",
+        "referrer",
+        "script",
+        "status_code",
+        "content_type",
+        "request_uri",
+        "request_method",
+        "expected_status_code",
+        "expected_response"
     ],
+    [
+        pytest.param(FixedData.report_type("legacy"),FixedData.blocked_url(),FixedData.document_url(),FixedData.disposition(),FixedData.effective_directive(),FixedData.effective_directive(),FixedData.original_policy(),FixedData.referrer(),FixedData.code_sample(),FixedData.status_code(),FixedData.content_type("legacy"),FixedData.request_uri("submit"),"POST",204, FixedData.empty(), id="post-legacy-report"),
+        pytest.param(FixedData.report_type("legacy"),FixedData.blocked_url(),FixedData.document_url(),FixedData.disposition(),FixedData.effective_directive(),FixedData.effective_directive(),FixedData.original_policy(),FixedData.referrer(),FixedData.code_sample(),FixedData.status_code(),FixedData.content_type("invalid"),FixedData.request_uri("submit"),"POST",400,'{"error":"400 Bad Request: Invalid content type. Expected one of application/csp-report application/reports+json, got \'text/html\'."}\n',id="invalid-content-type"),
+        pytest.param(FixedData.report_type("legacy"),FixedData.blocked_url(),FixedData.document_url(),FixedData.disposition(),FixedData.effective_directive(),FixedData.effective_directive(),FixedData.original_policy(),FixedData.referrer(),FixedData.code_sample(),FixedData.status_code(),FixedData.content_type("legacy"),FixedData.request_uri("invalid"),"POST",404,'{"error":"404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."}\n',id="uri-not-found"),
+        pytest.param(FixedData.report_type("legacy"),FixedData.blocked_url(),FixedData.document_url(),FixedData.disposition(),FixedData.effective_directive(),FixedData.effective_directive(),FixedData.original_policy(),FixedData.referrer(),FixedData.code_sample(),FixedData.status_code(),FixedData.content_type("legacy"),FixedData.request_uri("submit"),"GET",405,'{"error":"405 Method Not Allowed: The method is not allowed for the requested URL."}\n',id="method-not-allowed")
+    ]
 )
-def test_report_collector(client: FlaskClient, content_type, request_method, request_uri, blocked_uri, violated_directive, expected_status_code, expected_response):
-    ## Set default values where required
-    blocked_uri = "https://domain.evil" if blocked_uri == default else blocked_uri
-    content_type = "application/csp-report" if content_type == default else content_type
-    request_method = "POST" if request_method == default else request_method
-    request_uri = "/" if request_uri == default else request_uri
-    violated_directive = "frame-ancestors" if violated_directive == default else violated_directive
-
-    data = {
-        "csp-report": {
-            "document-uri": "https://example.com/csp",
-            "referrer": "",
-            "violated-directive": violated_directive,
-            "effective-directive": violated_directive,
-            "original-policy": "frame-ancestors *.domain.net;",
-            "disposition": "enforce",
-            "blocked-uri": blocked_uri,
-            "status-code": 0,
-            "script-sample": "",
-        }
-    }
+def test_receive_report_uri(client: FlaskClient, legacy_report_type, blocked_url, document_url, disposition, effective_directive, violated_directive, original_policy, referrer, script, status_code, content_type, request_uri, request_method, expected_status_code, expected_response):
+    report = generate_report_uri(legacy_report_type, blocked_url, document_url, disposition, effective_directive, violated_directive, original_policy, referrer, script, status_code)
     headers = {"Content-Type": content_type}
-
-    ## https://flask.palletsprojects.com/en/latest/testing/#tests-that-depend-on-an-active-context
-    response = client.open(path=request_uri, method=request_method, headers=headers, json=data)
-
-    assert response.status_code == expected_status_code
+    response = client.open(path=request_uri, method=request_method, headers=headers, json=report)
     assert response.content_type == "application/json"
+    assert response.status_code == expected_status_code
+    assert response.text == expected_response
 
-    if expected_response is None:
-        assert response.text == ""
-    else:
-        assert response.json == expected_response
+def test_receive_report_to():
+    pass
 
+def test_view_reports():
+    pass
+
+def test_view_report_detail():
+    pass
 
 def test_app_status(client: FlaskClient):
     response = client.get("/status")
@@ -114,11 +64,9 @@ def test_app_status(client: FlaskClient):
     assert response.content_type == "text/html; charset=utf-8"
     assert response.text == "ok"
 
-
 def test_version():
     ## https://python-semver.readthedocs.io/en/latest/usage/check-valid-semver-version.html
     assert Version.is_valid(csp_report_collector.__version__)
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-vvv", "--no-cov"])
