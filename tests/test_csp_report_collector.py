@@ -9,7 +9,7 @@ from flask.testing import FlaskClient
 from semver.version import Version
 
 import csp_report_collector
-from csp_report_collector import app, db
+from csp_report_collector import app, db, BaseModel
 
 
 def default():
@@ -18,19 +18,15 @@ def default():
 
 
 @pytest.fixture(scope="session")
-def mongo_test_db():
-    import mongomock
-
-    yield mongomock.MongoClient()["test"]
-
-
-@pytest.fixture(scope="session")
-def sql_test_db(flask_app):
+def sql_test_db():
     from flask_sqlalchemy import SQLAlchemy
 
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite::memory:"
-    db = SQLAlchemy(model_class=csp_report_collector.BaseModel)
-    db.init_app(flask_app)
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    db = SQLAlchemy(model_class=BaseModel)
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
 
     yield db
 
@@ -41,13 +37,7 @@ def client():
         yield app.test_client()
 
 
-@pytest.fixture()
-def mongo_mock():
-    mongo_client = mongomock.MongoClient()
-    yield mongo_client["test"]
-
-
-def test__write_to_database():
+def test__write_to_database(sql_test_db):
     csp_report = {
         "domain": "domain.evil",
         "blocked_uri": "https://domain.evil/",
@@ -56,9 +46,9 @@ def test__write_to_database():
         "violated_directive": "frame-ancestors",
     }
 
-    csp_report_collector._write_to_database(db, **csp_report)
+    csp_report_collector._write_to_database(sql_test_db, **csp_report)
 
-    assert db.session.query(csp_report_collector.ReportsModel).count()
+    assert sql_test_db.session.query(csp_report_collector.ReportsModel).count()
 
 
 @pytest.mark.parametrize(

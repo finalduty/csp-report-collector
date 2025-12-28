@@ -7,4 +7,5 @@ __pycache__
 *.conf
 *.egg-info
 *.sqlite
+htmlcov/
 tmp/

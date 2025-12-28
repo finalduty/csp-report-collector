@@ -32,9 +32,22 @@ logging.basicConfig(
 log = logging.getLogger("werkzeug")
 
 
+class BaseModel(DeclarativeBase):
+    __abstract__ = True  # So SQLAlchemy doesn't create this as a table
+
+
+class ReportsModel(BaseModel):
+    __tablename__ = "reports"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    domain: Mapped[str] = mapped_column(nullable=False, index=True)
+    document_uri: Mapped[str] = mapped_column(nullable=False, index=True)
+    blocked_uri: Mapped[str] = mapped_column(nullable=False, index=True)
+    violated_directive: Mapped[str] = mapped_column(nullable=False, index=True)
+    reported_at: Mapped[datetime] = mapped_column(nullable=False)
+
+
 ### Private Functions ###
-
-
 def _load_config(config_path: Optional[str] = "settings.conf", env_prefix: str = "CSPRC") -> dict:
     ## Initialise supported variables
     config: dict[str, Optional[str]] = {
@@ -89,20 +102,6 @@ app.config.update(_load_config())
 db = None
 
 if app.config["db_type"]:
-
-    class BaseModel(DeclarativeBase):
-        __abstract__ = True  # So SQLAlchemy doesn't create this as a table
-
-    class ReportsModel(BaseModel):
-        __tablename__ = "reports"
-
-        id: Mapped[int] = mapped_column(primary_key=True)
-        domain: Mapped[str] = mapped_column(nullable=False, index=True)
-        document_uri: Mapped[str] = mapped_column(nullable=False, index=True)
-        blocked_uri: Mapped[str] = mapped_column(nullable=False, index=True)
-        violated_directive: Mapped[str] = mapped_column(nullable=False, index=True)
-        reported_at: Mapped[datetime] = mapped_column(nullable=False)
-
     app.config["SQLALCHEMY_DATABASE_URI"] = URL.create(
         drivername=app.config["db_type"],
         username=app.config["db_username"],
@@ -120,9 +119,8 @@ if app.config["db_type"]:
 
 app.config["db"] = db
 
+
 ### Flask Handlers ###
-
-
 @app.errorhandler(400)  # 400 Bad Request
 def error_400(error):
     return make_response(jsonify({"error": str(error)}), 400)
