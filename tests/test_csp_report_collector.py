@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 ## https://flask.palletsprojects.com/en/latest/testing/
 
-from datetime import datetime
-from unittest.mock import patch
+from datetime import datetime, timezone
 
 import mongomock
 import pytest
@@ -14,6 +13,7 @@ from csp_report_collector import app, db
 
 
 def default():
+    """This function is intentionally blank so we can use it as a marker to replace default values with"""
     pass
 
 
@@ -52,7 +52,7 @@ def test__write_to_database():
         "domain": "domain.evil",
         "blocked_uri": "https://domain.evil/",
         "document_uri": "https://domain.evil/",
-        "reported_at": datetime.utcnow(),
+        "reported_at": datetime.now(timezone.utc),
         "violated_directive": "frame-ancestors",
     }
 

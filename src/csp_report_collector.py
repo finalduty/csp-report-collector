@@ -3,7 +3,7 @@ import html
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import URL
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-__version__ = "0.4.0"
+__version__ = "0.4.2"
 
 SUPPORTED_DB_ENGINES = [
     "mariadb",
@@ -92,7 +92,6 @@ if app.config["db_type"]:
 
     class BaseModel(DeclarativeBase):
         __abstract__ = True  # So SQLAlchemy doesn't create this as a table
-        pass
 
     class ReportsModel(BaseModel):
         __tablename__ = "reports"
@@ -172,7 +171,7 @@ def csp_receiver():
     if app.config["db"]:
         _write_to_database(
             db=app.config["db"],
-            reported_at=datetime.utcnow(),
+            reported_at=datetime.now(timezone.utc),
             domain=domain,
             document_uri=document_uri,
             blocked_uri=str(blocked_uri),
