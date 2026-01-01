@@ -1,58 +1,26 @@
 #!/usr/bin/env python3
 ## https://flask.palletsprojects.com/en/latest/testing/
 
-from datetime import datetime
-from unittest.mock import patch
+from datetime import datetime, timezone
 
-import mongomock
 import pytest
 from flask.testing import FlaskClient
 from semver.version import Version
 
 import csp_report_collector
-from csp_report_collector import app, db
 
 
 def default():
+    """This function is intentionally blank so we can use it as a marker to replace default values with"""
     pass
 
 
-@pytest.fixture(scope="session")
-def mongo_test_db():
-    import mongomock
-
-    yield mongomock.MongoClient()["test"]
-
-
-@pytest.fixture(scope="session")
-def sql_test_db(flask_app):
-    from flask_sqlalchemy import SQLAlchemy
-
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite::memory:"
-    db = SQLAlchemy(model_class=csp_report_collector.BaseModel)
-    db.init_app(flask_app)
-
-    yield db
-
-
-@pytest.fixture(autouse=True)
-def client():
-    with app.app_context():
-        yield app.test_client()
-
-
-@pytest.fixture()
-def mongo_mock():
-    mongo_client = mongomock.MongoClient()
-    yield mongo_client["test"]
-
-
-def test__write_to_database():
+def test__write_to_database(db):
     csp_report = {
         "domain": "domain.evil",
         "blocked_uri": "https://domain.evil/",
         "document_uri": "https://domain.evil/",
-        "reported_at": datetime.utcnow(),
+        "reported_at": datetime.now(timezone.utc),
         "violated_directive": "frame-ancestors",
     }
 
@@ -98,6 +66,7 @@ def test_report_collector(client: FlaskClient, content_type, request_method, req
 
     ## https://flask.palletsprojects.com/en/latest/testing/#tests-that-depend-on-an-active-context
     response = client.open(path=request_uri, method=request_method, headers=headers, json=data)
+    print(f"Response: {response.status_code} {response.data}")
 
     assert response.status_code == expected_status_code
     assert response.content_type == "application/json"
