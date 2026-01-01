@@ -3,13 +3,12 @@
 
 from datetime import datetime, timezone
 
-import mongomock
 import pytest
 from flask.testing import FlaskClient
 from semver.version import Version
 
 import csp_report_collector
-from csp_report_collector import app, db, BaseModel
+from csp_report_collector import app, BaseModel
 
 
 def default():
