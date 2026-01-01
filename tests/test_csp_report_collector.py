@@ -8,7 +8,6 @@ from flask.testing import FlaskClient
 from semver.version import Version
 
 import csp_report_collector
-from csp_report_collector import app, BaseModel
 
 
 def default():
@@ -16,27 +15,7 @@ def default():
     pass
 
 
-@pytest.fixture(scope="session")
-def sql_test_db():
-    from flask_sqlalchemy import SQLAlchemy
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-    db = SQLAlchemy(model_class=BaseModel)
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-
-    yield db
-
-
-@pytest.fixture(autouse=True)
-def client():
-    with app.app_context():
-        yield app.test_client()
-
-
-def test__write_to_database(sql_test_db):
+def test__write_to_database(db):
     csp_report = {
         "domain": "domain.evil",
         "blocked_uri": "https://domain.evil/",
@@ -45,9 +24,9 @@ def test__write_to_database(sql_test_db):
         "violated_directive": "frame-ancestors",
     }
 
-    csp_report_collector._write_to_database(sql_test_db, **csp_report)
+    csp_report_collector._write_to_database(db, **csp_report)
 
-    assert sql_test_db.session.query(csp_report_collector.ReportsModel).count()
+    assert db.session.query(csp_report_collector.ReportsModel).count()
 
 
 @pytest.mark.parametrize(
@@ -87,6 +66,7 @@ def test_report_collector(client: FlaskClient, content_type, request_method, req
 
     ## https://flask.palletsprojects.com/en/latest/testing/#tests-that-depend-on-an-active-context
     response = client.open(path=request_uri, method=request_method, headers=headers, json=data)
+    print(f"Response: {response.status_code} {response.data}")
 
     assert response.status_code == expected_status_code
     assert response.content_type == "application/json"
