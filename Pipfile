@@ -18,11 +18,11 @@ csp-report-collector = {file = ".", editable = true}
 black = "*"
 flake8 = "*"
 isort = "*"
-mongomock = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-dotenv = "*"
 semver = "*"
+vermin = "*"
 
 [requires]
 python_version = "3.12"
